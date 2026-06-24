@@ -3,10 +3,13 @@
 
 # Ignorar configuraciones y datos de servicios
 
-pihole/
-jellyfin/
-nginx/
-portainer/
-media/
+management/portainer/
+network/pihole/
+network/nginx/
+media/prowlarr/
+media/radarr/
+media/qbittorrent/
+media/jellyfin
+media/media_data/
 
 

@@ -1,27 +1,19 @@
 services:
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-      - "9443:9443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./portainer/portainer_data:/data
-  
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "8080:8080/tcp"
-      - "443:443/tcp"
+      - "8082:8082/tcp"
+      - "8443:8443/tcp"
+    env_file:
+      ../.env
     environment:
       TZ: 'America/Argentina'
       FTLCONF_webserver_api_password: ${PIHOLE_PW}
+      FTLCONG_webserver_port: "8082,8443s"
     volumes:
       - ./pihole/etc-pihole:/etc/pihole
       - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
@@ -33,7 +25,7 @@ services:
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
     environment:
-      TZ: "America/Argentina"
+      - TZ="America/Argentina"
     ports:
       - '80:80'
       - '81:81'
@@ -42,16 +34,4 @@ services:
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
 
-  jellyfin:
-    image: jellyfin/jellyfin:latest
-    container_name: jellyfin
-    user: "1000:1000"
-    network_mode: host
-    volumes:
-      - ./jellyfin/cache:/cache
-      - ./jellyfin/config:/config
-      - ./media:/media:ro
-    restart: unless-stopped
 
-volumes:
-  portainer_data:
