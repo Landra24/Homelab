@@ -20,8 +20,12 @@ services:
     restart: unless-stopped
     dns:
       - 1.1.1.1
+    networks:
+      homelab:
+        ipv4_address: 172.16.0.2
 
   nginx-proxy-manager:
+    container_name: nginx
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
     environment:
@@ -33,5 +37,15 @@ services:
     volumes:
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      homelab:
+        ipv4_address: 172.16.0.3
 
-
+networks:
+  homelab:
+    name: homelab
+    external: true
+    ipam:
+      config:
+        - subnet: 172.16.0.0/24
+    
