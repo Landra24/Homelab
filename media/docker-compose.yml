@@ -1,0 +1,127 @@
+services:
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8123
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./qbittorrent/config:/config
+      - ./data:/data
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8  
+    ports:
+      - 8123:8123
+      - 6881:6881
+      - 6881:6881/udp
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.1
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - .radarr/config:/config
+      - ./data:/data
+    ports:
+      - 7878:7878
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.2
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ="{TZ}"
+    volumes:
+      - ./prowlarr/config:/config
+    ports:
+      - 9696:9696
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.3
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ={TZ}
+    volumes:
+      - ./bazarr/config:/config
+      - ./data:/data
+    ports:
+      - 6767:6767
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.4
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./jellyfin/config:/config
+      - ./data:/data
+    ports:
+      - 8096:8096
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.5
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+    ports:
+      - 5055:5055
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    volumes:
+      - /jellyseerr/config:/config
+    networks:
+      homelab:
+        ipv4_address: 172.16.2.6
+    restart: unless-stopped
+
+networks:
+  homelab:
+    name: homelab
+    external: true

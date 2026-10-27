@@ -1,0 +1,67 @@
+services:
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8082:8082/tcp"
+      - "8443:8443/tcp"
+    environment:
+      TZ: ${TZ}
+      FTLCONF_webserver_api_password: ${PIHOLE_PW}
+      FTLCONG_webserver_port: "8082,8443s"
+    volumes:
+      - ./pihole/etc-pihole:/etc/pihole
+      - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.0.2
+    restart: unless-stopped
+
+  nginx-proxy-manager:
+    container_name: nginx
+    image: 'jc21/nginx-proxy-manager:latest'
+    environment:
+      - TZ=${TZ}
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8 
+    volumes:
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      homelab:
+        ipv4_address: 172.16.0.3
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ}
+    ports:
+      - 8191:8191
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    networks:
+      homelab:
+        ipv4_address: 172.16.0.4
+    restart: unless-stopped 
+
+networks:
+  homelab:
+    name: homelab
+    external: true
